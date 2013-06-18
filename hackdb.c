@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
 
     scanf("%s %s %s", cmd, key, value);
 
-    if (!strcmp(cmd, "add"))
-      hdb_add(db, key, value);
+    if (!strcmp(cmd, "set"))
+      hdb_set(db, key, value);
     else if (!strcmp(cmd, "del"))
       hdb_del(db, key);
     else if (!strcmp(cmd, "count"))

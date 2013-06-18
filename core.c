@@ -19,7 +19,7 @@ hdb_record *hdb_record_create(char *key, char *value, hdb_record *next) {
   return record;
 }
 
-int hdb_add(hdb_t *db, char *key, char *value) {
+int hdb_set(hdb_t *db, char *key, char *value) {
   hdb_record *previous = NULL;
   hdb_record *current = db->head;
   hdb_record *existing_record;
