@@ -7,7 +7,7 @@ export CFLAGS := $(CFLAGS) -O0 -g # DEBUG
 
 all: hackdb
 
-hackdb: hackdb.c hackdb.h
+hackdb: hackdb.c hackdb.h main.c
 
 clean:
 	rm -rf hackdb hackdb.dSYM

@@ -1,4 +1,8 @@
 #include "hackdb.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 hdb_t *hdb_create(void) {
   hdb_t *db = malloc(sizeof(hdb_t));
@@ -80,28 +84,4 @@ void hdb_destroy(hdb_t *db) {
   }
 
   free(db);
-}
-
-int main(int argc, char *argv[]) {
-  char cmd[256];
-  char key[256];
-  char value[256];
-
-  hdb_t *db = hdb_create();
-  printf("\n\nWelcome to HackDB.\nYou don't care about your data and neither do we!\n\n");
-  while (1) {
-    printf("hdb> ");
-    scanf("%s %s %s", cmd, key, value);
-
-    if (!strcmp(cmd, "add"))
-      hdb_add(db, key, value);
-    else if (!strcmp(cmd, "get"))
-      printf("%s\n", hdb_get(db, key));
-    else if (!strcmp(cmd, "count"))
-      printf("%u\n", hdb_count(db));
-    else
-      printf("Invalid command.\n");
-  }
-
-  printf("%s %s %s\n", cmd, key, value);
 }

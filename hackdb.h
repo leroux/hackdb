@@ -1,11 +1,6 @@
 #ifndef __HACKDB_H
 #define __HACKDB_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-
 typedef struct hdb_record {
   char *key;
   char *value;
