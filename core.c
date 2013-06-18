@@ -69,6 +69,7 @@ int hdb_del(hdb_t *db, char *key) {
 
     if (strcmp(previous->key, key) == 0) {
       previous2->next = current; 
+      free(previous);
       return 0;
     }
   }
