@@ -2,64 +2,67 @@
 
 hdb_t *hdb_create(void) {
   hdb_t *db = malloc(sizeof(hdb_t));
-  db->first = NULL;
+  db->head = NULL;
   return db;
 }
 
+hdb_record *hdb_record_create(char *key, char *value) {
+  hdb_record *record = malloc(sizeof(hdb_record));
+  record->key = strdup(key);
+  record->value = strdup(value);
+  record->next = NULL;
+
+  return record;
+}
+
 int hdb_add(hdb_t *db, char *key, char *value) {
-  hdb_record *current = db->first;
-  hdb_record *new = malloc(sizeof(hdb_record));
+  hdb_record *previous = NULL;
+  hdb_record *current = db->head;
 
-  new->key = strdup(key);
-  new->value = strdup(value);
-  new->next = NULL;
-
-  if (current == NULL) {
-    db->first = new;
+  // if db is empty construct the head.
+  if (db->head == NULL) {
+    db->head = hdb_record_create(key, value);
     return 0;
   }
 
-  while (current->next != NULL) {
+  // Traverse until previous is the last node.
+  while (current != NULL) {
+    previous = current;
     current = current->next;
   }
 
-  current->next = new;
+  // Append to the last node.
+  previous->next = hdb_record_create(key, value);
 
   return 0;
 }
 
 char *hdb_get(hdb_t *db, char *key) {
-  hdb_record *current = db->first;
+  hdb_record *previous = NULL;
+  hdb_record *current = db->head;
 
-  if (current == NULL) {
-    return NULL;
-  }
-
-  if (strcmp(current->key, key) == 0) {
-    return current->value;
-  }
-
-  while (current->next != NULL) {
-    current = current->next;
-
+  while (current != NULL) {
     if (strcmp(current->key, key) == 0) {
       return current->value;
     }
+
+    previous = current;
+    current = current->next;
   }
 
-  return NULL; // Traversed the entire list and didn't find the key.
+  return NULL; // Traversed the entire list and didn't find a matching key.
 }
 
 unsigned int hdb_count(hdb_t *db) {
-  int count = 1;
-  hdb_record *current = db->first;
+  int count = 0;
+  hdb_record *current = db->head;
 
   if (current == NULL) {
     return 0;
   }
 
-  while (current->next != NULL) {
-    ++count;
+  while (current != NULL) {
+    count++;
     current = current->next;
   }
 
@@ -67,16 +70,15 @@ unsigned int hdb_count(hdb_t *db) {
 }
 
 void hdb_destroy(hdb_t *db) {
-  hdb_record *current = db->first;
-  hdb_record *next;
+  hdb_record *previous = NULL;
+  hdb_record *current = db->head;
 
-  while (current->next != NULL) {
-    next = current->next;
-    free(current);
-    current = next;
+  while (current != NULL) {
+    previous = current;
+    current = current->next;
+    free(previous);
   }
 
-  free(current);
   free(db);
 }
 
@@ -93,6 +95,8 @@ int main(int argc, char *argv[]) {
 
     if (!strcmp(cmd, "add"))
       hdb_add(db, key, value);
+    else if (!strcmp(cmd, "get"))
+      printf("%s\n", hdb_get(db, key));
     else if (!strcmp(cmd, "count"))
       printf("%u\n", hdb_count(db));
     else
