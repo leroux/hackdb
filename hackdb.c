@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     if (!strcmp(cmd, "set"))
       hdb_set(db, key, value);
     else if (!strcmp(cmd, "del"))
-      hdb_del(db, key);
+      hdb_del(db, hdb_get(db, key));
     else if (!strcmp(cmd, "count"))
       printf("%u\n", hdb_count(db));
     else if (!strcmp(cmd, "list"))

@@ -6,31 +6,39 @@
 
 hdb_t *hdb_create(void) {
   hdb_t *db = malloc(sizeof(hdb_t));
+
+  if (!db) {
+    perror("Could not allocate memory for database");
+  }
+
   db->head = NULL;
   return db;
 }
 
-hdb_record *hdb_record_create(char *key, char *value, hdb_record *next) {
+hdb_record *hdb_record_create(const char *key, const char *value, hdb_record *previous, hdb_record *next) {
   hdb_record *record = malloc(sizeof(hdb_record));
   record->key = strdup(key);
   record->value = strdup(value);
+  record->previous = previous;
   record->next = next;
 
   return record;
 }
 
-int hdb_set(hdb_t *db, char *key, char *value) {
+int hdb_set(hdb_t *db, const char *key, const char *value) {
   hdb_record *previous = NULL;
   hdb_record *current = db->head;
-  hdb_record *existing_record;
+  hdb_record *existing_record = NULL;
 
   if (hdb_count(db) == 0) {
-    db->head = hdb_record_create(key, value, NULL);
+    db->head = hdb_record_create(key, value, NULL, NULL);
     return 0;
   }
 
   existing_record = hdb_get(db, key);
-  if (existing_record) return hdb_update(existing_record, value);
+
+  if (existing_record)
+    return hdb_update(existing_record, value);
 
   // Traverse until current is greater than the new record's key.
   while (current != NULL && strcmp(current->key, key) <= 0) {
@@ -39,55 +47,47 @@ int hdb_set(hdb_t *db, char *key, char *value) {
   }
 
   if (previous == NULL) {
-    db->head = hdb_record_create(key, value, current); 
+    db->head = hdb_record_create(key, value, NULL, current); 
   } else {
-    previous->next = hdb_record_create(key, value, current);
+    previous->next = hdb_record_create(key, value, previous, current);
   }
 
   return 0;
 }
 
-int hdb_update(hdb_record *record, char * value) {
+int hdb_update(hdb_record *record, const char *value) {
+  if (!record) {
+    return error("Referenced record does not exist.");
+  }
+
   record->value = strdup(value);
+
   return 0;
 }
 
-int hdb_del(hdb_t *db, char *key) {
-  hdb_record *previous2 = NULL;
-  hdb_record *previous = NULL;
-  hdb_record *current = db->head;
+int hdb_del(hdb_t *db, hdb_record *record) {
+  if (!db) {
+    return error("Referenced database does not exist.");
+  } else if (!db->head) {
+    return error("Empty database.");
+  } else if (!record) {
+    return error("Referenced record does not exist.");
+  }
 
-  if(hdb_count(db) == 0) return -1;
-
-  // If head is a matching key, shift db->head to its next.
-  // else shift references to the next block.
-  if (strcmp(db->head->key, key) == 0) {
-    db->head = current->next;
-    free(current);
-    return 0;
+  if (record == db->head) {
+    db->head = db->head->next;
+    if (db->head)
+      db->head->previous = NULL;
+    free(record); // record is the old db->head.
   } else {
-    previous2 = previous;
-    previous = current;
-    current = current->next;
+    record->previous->next = record->next;
+    free(record);
   }
 
-  while (current != NULL) {
-    previous2 = previous;
-    previous = current;
-    current = current->next;
-
-    if (strcmp(previous->key, key) == 0) {
-      previous2->next = current; 
-      free(previous);
-      return 0;
-    }
-  }
-
-  return -1; // matching key not found.
+  return 0;
 }
 
-hdb_record *hdb_get(hdb_t *db, char *key) {
-  hdb_record *previous = NULL;
+hdb_record *hdb_get(hdb_t *db, const char *key) {
   hdb_record *current = db->head;
 
   while (current != NULL) {
@@ -95,35 +95,34 @@ hdb_record *hdb_get(hdb_t *db, char *key) {
       return current;
     }
 
-    previous = current;
     current = current->next;
   }
 
   return NULL; // Traversed the entire list and didn't find a matching key.
 }
 
-void hdb_destroy(hdb_t *db) {
-  hdb_record *previous = NULL;
+int hdb_destroy(hdb_t *db) {
   hdb_record *current = db->head;
 
+  if (!db) {
+    
+  }
+
   while (current != NULL) {
-    previous = current;
+    free(current->previous);
     current = current->next;
-    free(previous);
   }
 
   free(db);
+
+  return 0;
 }
 
 void hdb_list_contents(hdb_t *db) {
   hdb_record *current = db->head;
 
-  printf("----------------------\n");
-  printf("| Key\t| Value      |\n");
-  printf("----------------------\n");
-
   while (current != NULL) {
-    printf("  %s:\t  %s\n", current->key, current->value);
+    printf("%s => \"%s\"\n", current->key, current->value);
     current = current->next;
   }
 }
@@ -142,4 +141,14 @@ unsigned int hdb_count(hdb_t *db) {
   }
 
   return count;
+}
+
+int error(const char *msg) {
+  if (errno) {
+    perror(msg);
+  } else {
+    printf("Error: %s\n", msg);
+  }
+
+  return -1;
 }
