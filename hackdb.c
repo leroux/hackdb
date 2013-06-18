@@ -6,34 +6,35 @@
 
 int main(int argc, char *argv[]) {
   hdb_t *db = hdb_create();
-
-  //char cmd[MAXCMD];
-  //char *args[MAXARGS]
-  
-  char cmd[MAXCMD];
-  char key[MAXCMD];
-  char value[MAXCMD];
-
-  // SCRAP ENTIRE PROMPT
-  // Use fgets and parse the line.
+  char buffer[MAX_INPUT];
+  char *token;
+  char cmds[MAX_ARGS][MAX_INPUT];
+  int i = 0, args_count = 0;
 
   printf("\nHackDB :: You don't care about your data -> neither do we!\n");
+  
   while (1) {
     printf("hdb> ");
+    fgets(buffer, MAX_INPUT, stdin);
 
-    scanf("%s %s %s", cmd, key, value);
+    for (i = 0, token = strtok(buffer, SEPARATOR); i < MAX_ARGS && token != NULL; i++) {
+      strncpy(cmds[i], token, MAX_INPUT); 
+      token = strtok(NULL, SEPARATOR); 
+    }
 
-    if (!strcmp(cmd, "set"))
-      hdb_set(db, key, value);
-    else if (!strcmp(cmd, "del"))
-      hdb_del(db, hdb_get(db, key));
-    else if (!strcmp(cmd, "count"))
+    args_count = i;
+ 
+    if (!strcmp(cmds[0], "set"))
+      hdb_set(db, cmds[1], cmds[2]);
+    else if (!strcmp(cmds[0], "del"))
+      hdb_del(db, hdb_get(db, cmds[1]));
+    else if (!strcmp(cmds[0], "count"))
       printf("%u\n", hdb_count(db));
-    else if (!strcmp(cmd, "list"))
+    else if (!strcmp(cmds[0], "list"))
       hdb_list_contents(db);
-    else if (!strcmp(cmd, "get"))
-      printf("%s\n", hdb_get(db, key)->value);
-    else if (!strcmp(cmd, "exit"))
+    else if (!strcmp(cmds[0], "get"))
+      printf("%s\n", hdb_get(db, cmds[1])->value);
+    else if (!strcmp(cmds[0], "exit"))
       break;
     else
       printf("Invalid command.\n");

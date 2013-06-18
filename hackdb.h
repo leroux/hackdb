@@ -1,8 +1,9 @@
 #ifndef __HACKDB_H
 #define __HACKDB_H
 
-#define MAXCMD 512
-#define MAXARGS 10
+#define MAX_INPUT 512
+#define MAX_ARGS 10
+#define SEPARATOR " \n"
 
 int main(int argc, char *argv[]);
 
