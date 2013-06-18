@@ -1,8 +1,4 @@
 HackDB
 ======
 
-POST k v
-DEL k
-PUT k v
-GET k
-COUNT
+Just a simple and small KV store.
