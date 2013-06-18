@@ -53,10 +53,8 @@ int hdb_del(hdb_t *db, char *key) {
   // If head is a matching key, shift db->head to its next.
   // else shift references to the next block.
   if (strcmp(db->head->key, key) == 0) {
-    previous = db->head;
-    current = current->next;
-    db->head = current;
-    free(previous);
+    db->head = current->next;
+    free(current);
     return 0;
   } else {
     previous2 = previous;
