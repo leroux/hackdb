@@ -23,7 +23,7 @@ int hdb_add(hdb_t *db, char *key, char *value) {
   hdb_record *previous = NULL;
   hdb_record *current = db->head;
 
-  if (db->head == NULL) {
+  if (hdb_count(db) == 0) {
     db->head = hdb_record_create(key, value, NULL);
     return 0;
   }
