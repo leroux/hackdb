@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     else if (!strcmp(cmd, "list"))
       hdb_list_contents(db);
     else if (!strcmp(cmd, "get"))
-      printf("%s\n", hdb_get(db, key));
+      printf("%s\n", hdb_get(db, key)->value);
     else if (!strcmp(cmd, "exit"))
       break;
     else

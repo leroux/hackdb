@@ -17,8 +17,9 @@ typedef struct {
 hdb_t *hdb_create(void);
 hdb_record *hdb_record_create(char *key, char *value, hdb_record *next);
 int hdb_add(hdb_t *db, char *key, char *value);
+int hdb_update(hdb_record *record, char *value);
 int hdb_del(hdb_t *db, char *key);
-char *hdb_get(hdb_t *db, char *key);
+hdb_record *hdb_get(hdb_t *db, char *key);
 int hdb_del(hdb_t *db, char *key);
 void hdb_destroy(hdb_t *db);
 

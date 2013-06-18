@@ -22,11 +22,15 @@ hdb_record *hdb_record_create(char *key, char *value, hdb_record *next) {
 int hdb_add(hdb_t *db, char *key, char *value) {
   hdb_record *previous = NULL;
   hdb_record *current = db->head;
+  hdb_record *existing_record;
 
   if (hdb_count(db) == 0) {
     db->head = hdb_record_create(key, value, NULL);
     return 0;
   }
+
+  existing_record = hdb_get(db, key);
+  if (existing_record) return hdb_update(existing_record, value);
 
   // Traverse until current is greater than the new record's key.
   while (current != NULL && strcmp(current->key, key) <= 0) {
@@ -40,6 +44,11 @@ int hdb_add(hdb_t *db, char *key, char *value) {
     previous->next = hdb_record_create(key, value, current);
   }
 
+  return 0;
+}
+
+int hdb_update(hdb_record *record, char * value) {
+  record->value = strdup(value);
   return 0;
 }
 
@@ -77,13 +86,13 @@ int hdb_del(hdb_t *db, char *key) {
   return -1; // matching key not found.
 }
 
-char *hdb_get(hdb_t *db, char *key) {
+hdb_record *hdb_get(hdb_t *db, char *key) {
   hdb_record *previous = NULL;
   hdb_record *current = db->head;
 
   while (current != NULL) {
     if (strcmp(current->key, key) == 0) {
-      return current->value;
+      return current;
     }
 
     previous = current;
