@@ -34,8 +34,11 @@ int hdb_add(hdb_t *db, char *key, char *value) {
     current = current->next;
   }
 
-  // Insert new record after previous.
-  previous->next = hdb_record_create(key, value, previous->next);
+  if (previous == NULL) {
+    db->head = hdb_record_create(key, value, current); 
+  } else {
+    previous->next = hdb_record_create(key, value, current);
+  }
 
   return 0;
 }
