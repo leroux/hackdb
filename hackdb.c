@@ -12,32 +12,33 @@ int main(int argc, char *argv[]) {
   int i = 0, args_count = 0;
 
   printf("\nHackDB :: You don't care about your data -> neither do we!\n");
-  
+
   while (1) {
     printf("hdb> ");
     fgets(buffer, MAX_INPUT, stdin);
 
     for (i = 0, token = strtok(buffer, SEPARATOR); i < MAX_ARGS && token != NULL; i++) {
-      strncpy(cmds[i], token, MAX_INPUT); 
-      token = strtok(NULL, SEPARATOR); 
+      strncpy(cmds[i], token, MAX_INPUT);
+      token = strtok(NULL, SEPARATOR);
     }
 
     args_count = i;
- 
-    if (!strcmp(cmds[0], "set"))
+
+    if (!strcmp(cmds[0], "set")) {
       hdb_set(db, cmds[1], cmds[2]);
-    else if (!strcmp(cmds[0], "del"))
+    } else if (!strcmp(cmds[0], "del")) {
       hdb_del(db, hdb_get(db, cmds[1]));
-    else if (!strcmp(cmds[0], "count"))
+    } else if (!strcmp(cmds[0], "count")) {
       printf("%u\n", hdb_count(db));
-    else if (!strcmp(cmds[0], "list"))
+    } else if (!strcmp(cmds[0], "list")) {
       hdb_list_contents(db);
-    else if (!strcmp(cmds[0], "get"))
+    } else if (!strcmp(cmds[0], "get")) {
       printf("%s\n", hdb_get(db, cmds[1])->value);
-    else if (!strcmp(cmds[0], "exit"))
+    } else if (!strcmp(cmds[0], "exit")) {
       break;
-    else
+    } else {
       printf("Invalid command.\n");
+    }
   }
 
   hdb_destroy(db);
