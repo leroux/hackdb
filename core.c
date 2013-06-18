@@ -105,7 +105,7 @@ int hdb_destroy(hdb_t *db) {
   hdb_record *current = db->head;
 
   if (!db) {
-    
+    return error("Referenced database does not exist.");
   }
 
   while (current != NULL) {
