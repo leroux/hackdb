@@ -1,6 +1,10 @@
 #ifndef __CORE_H
 #define __CORE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 typedef struct hdb_record {
   char *key;
   char *value;
