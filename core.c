@@ -11,33 +11,9 @@ hdb_t *hdb_create(void) {
   if (!db)
     error("Could not allocate memory for database");
 
-  db->head = db->last = hdb_alloc_and_init(BLOCKSIZE);
+  db->head = db->last = hdb_alloc_and_init(BLOCKSIZE, NULL);
 
   return db;
-}
-
-hdb_record *hdb_alloc_and_init(unsigned int blocksize) {
-  hdb_record *head; 
-  hdb_record *current = NULL;
-  int i = 0;
-
-  head = malloc(sizeof(hdb_record) * blocksize);
-
-  if(!head)
-    error("Could not allocate memory for list block");
-
-  head->previous = NULL;
-  head->next = current = (head + 1);
-
-  for (i = 1; i < BLOCKSIZE - 1; i++) {
-    (current + i)->previous = current - 1;
-    (current + i)->next = current + 1;
-  }
-
-  (current + i + 1)->previous = current - 1;
-  (current + i + 1)->next = NULL;
-  
-  return head;
 }
 
 int hdb_set(hdb_t *db, const char *key, const char *value) {
@@ -46,18 +22,10 @@ int hdb_set(hdb_t *db, const char *key, const char *value) {
   hdb_record *existing_record = NULL;
   hdb_record *new = NULL;
 
-  // If at the end of currently allocated list, grow the list.
-  if (!db->last->next)
-    db->last->next = hdb_alloc_and_init(BLOCKSIZE); 
-
-  // If list is empty, set head and move last.
-  // db->last is a reference to the next allocated node to use.
-  // Therefore db->last must be incremented whenever it is used.
   if (db->head == db->last) {
     db->head->key = strdup(key);
     db->head->value = strdup(value); 
-    db->last++; // must increment to next free spot.
-
+    db->last++;
     return 0;
   }
 
@@ -72,11 +40,9 @@ int hdb_set(hdb_t *db, const char *key, const char *value) {
     current = current->next;
   }
 
-  // new record; db->last is incremented to next free position.
-  new = db->last++;
+  new = hdb_get_next_free(db);
 
-  if (!previous) { // prepend: new record will become the head.
-    new = db->last++; // must increment last to next free spot.
+  if (current == db->head) { // prepend: new will become the head.
     new->key = strdup(key);
     new->value = strdup(value);
 
@@ -84,8 +50,6 @@ int hdb_set(hdb_t *db, const char *key, const char *value) {
     new->previous = NULL;
     new->next = db->head;
 
-    // prepend new to list.
-    db->head->previous = new;
     db->head = new;
   } else { // insert new after previous.
     new->previous = previous;
@@ -154,6 +118,44 @@ int hdb_destroy(hdb_t *db) {
   free(db);
 
   return 0;
+}
+
+hdb_record *hdb_alloc_and_init(unsigned int blocksize, hdb_record *lastblocks_last) {
+  hdb_record *head = NULL;
+  int i = 0;
+
+  head = malloc(sizeof(hdb_record) * blocksize);
+
+  if(!head)
+    error("Could not allocate memory for list block.");
+
+  head->previous = lastblocks_last;
+  head->next = head + 1;
+
+  for (i = 1; i < BLOCKSIZE - 1; i++) {
+    (head + i)->previous = head + i - 1;
+    (head + i)->next = head + i + 1;
+  }
+
+  (head + i + 1)->previous = head + i;
+  (head + i + 1)->next = NULL;
+  
+  return head;
+}
+
+hdb_record *hdb_get_next_free(hdb_t *db) {
+  hdb_record *new = NULL;
+
+  if (!db->last->next)
+    db->last = hdb_alloc_and_init(BLOCKSIZE, db->last);
+
+  new = db->last++;
+
+  if (new->previous)
+    new->previous->next = new->next->previous;
+  new->next->previous = new->previous;
+
+  return new;
 }
 
 void hdb_list_contents(hdb_t *db) {
