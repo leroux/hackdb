@@ -89,7 +89,7 @@ int hdb_del(hdb_t *db, hdb_record *record) {
 hdb_record *hdb_get(hdb_t *db, const char *key) {
   hdb_record *current = db->head;
 
-  while (!current) {
+  while (current) {
     if (strcmp(current->key, key) == 0)
       return current;
 
