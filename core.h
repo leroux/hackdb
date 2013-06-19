@@ -1,6 +1,8 @@
 #ifndef __CORE_H
 #define __CORE_H
 
+#define BLOCKSIZE 2
+
 typedef struct hdb_record {
   char *key;
   char *value;
@@ -9,12 +11,13 @@ typedef struct hdb_record {
 } hdb_record; 
 
 typedef struct {
-  hdb_record *head;
+  hdb_record *head; // head of list.
+  hdb_record *last; // the next free node of list.
 } hdb_t;
 
 // Core
 hdb_t *hdb_create(void);
-hdb_record *hdb_record_create(const char *key, const char *value, hdb_record *previous, hdb_record *next);
+hdb_record *hdb_alloc_and_init();
 int hdb_set(hdb_t *db, const char *key, const char *value);
 hdb_record *hdb_get(hdb_t *db, const char *key);
 int hdb_update(hdb_record *record, const char *value);
