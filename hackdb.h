@@ -1,5 +1,5 @@
-#ifndef __HACKDB_H
-#define __HACKDB_H
+#ifndef __HACKDB_H_
+#define __HACKDB_H_
 
 #define MAX_INPUT 512
 #define MAX_ARGS 10
