@@ -35,7 +35,7 @@ int hdb_set(hdb_t *db, const char *key, const char *value) {
     return 0;
   }
 
-  existing_record = hdb_get(db, key);
+  existing_record = hdb_get_record(db, key);
 
   if (existing_record)
     return hdb_update(existing_record, value);
@@ -86,7 +86,7 @@ int hdb_del(hdb_t *db, hdb_record *record) {
   return 0;
 }
 
-hdb_record *hdb_get(hdb_t *db, const char *key) {
+hdb_record *hdb_get_record(hdb_t *db, const char *key) {
   hdb_record *current = db->head;
 
   while (current) {
@@ -97,6 +97,15 @@ hdb_record *hdb_get(hdb_t *db, const char *key) {
   }
 
   return NULL; // Traversed the entire list and didn't find a matching key.
+}
+
+char *hdb_get(hdb_t *db, const char *key) {
+  hdb_record *record = hdb_get_record(db, key);
+
+  if (record)
+    return record->value;
+  else
+    return NULL;
 }
 
 int hdb_destroy(hdb_t *db) {
