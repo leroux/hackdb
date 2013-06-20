@@ -1,10 +1,6 @@
 #ifndef __CORE_H
 #define __CORE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 typedef struct hdb_record {
   char *key;
   char *value;
@@ -15,6 +11,10 @@ typedef struct hdb_record {
 typedef struct {
   hdb_record *head;
 } hdb_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 // Core
 hdb_t *hdb_create(void);
@@ -31,5 +31,9 @@ void hdb_list_contents(hdb_t *db);
 unsigned int hdb_count(hdb_t *db);
 
 int error(const char *msg);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif
