@@ -65,13 +65,11 @@ int hdb_update(hdb_record *record, const char *value) {
   return 0;
 }
 
-int hdb_del(hdb_t *db, hdb_record *record) {
-  if (!db)
-    return error("Referenced database does not exist.");
-  else if (!db->head)
-    return error("Empty database.");
-  else if (!record)
-    return error("Referenced record does not exist.");
+int hdb_del(hdb_t *db, char *key) {
+  hdb_record *record = hdb_get_record(db, key);
+
+  if (!record)
+    return -1;
 
   if (record == db->head) {
     db->head = db->head->next;

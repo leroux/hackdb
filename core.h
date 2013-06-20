@@ -23,7 +23,7 @@ int hdb_set(hdb_t *db, const char *key, const char *value);
 hdb_record *hdb_get_record(hdb_t *db, const char *key);
 char *hdb_get(hdb_t *db, const char *key);
 int hdb_update(hdb_record *record, const char *value);
-int hdb_del(hdb_t *db, hdb_record *record);
+int hdb_del(hdb_t *db, char *key);
 int hdb_destroy(hdb_t *db);
 
 // Miscellaneous
