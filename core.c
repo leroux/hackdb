@@ -113,7 +113,7 @@ int hdb_destroy(hdb_t *db) {
     return error("Referenced database does not exist.");
   }
 
-  while (!current) {
+  while (current) {
     free(current->previous);
     current = current->next;
   }
